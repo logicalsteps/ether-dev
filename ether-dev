@@ -1,0 +1,304 @@
+#!/usr/bin/env bash
+
+success="-\033[1;32m success \033[0;0m"
+failed="-\033[1;31m failed \033[0;0m"
+echo -e "\033[1;33m
+     __ _   _                      ___
+    /__\ |_| |__   ___ _ __       /   \_____   __
+   /_\ | __| '_ \ / _ \ '__|____ / /\ / _ \ \ / /
+  //__ | |_| | | |  __/ | |_____/ /_//  __/\ V /
+  \__/  \__|_| |_|\___|_|      /___,' \___| \_/   \033[0;0m
+
+  Instant Ethereum Development Chain version 1.0.0
+  "
+
+usage(){
+  echo -n "  USAGE:
+       ether-dev [options] command...
+
+  Performs install and start when command is not specified.
+  Commands will be executed one by one in the same order
+
+  COMMANDS:
+       install         Create private chain in current working directory
+       uninstall       Remove chain from current working directory
+       reset           Perform uninstall and install
+       start           Start development chain in current working directory
+       stop            Stop development chain running in current working directory
+
+  OPTIONS:
+       -v | --version  Print version number
+       -h | --help     Shows a list of commands and options
+
+"
+}
+
+uninstall() {
+    printf "   * Uninstalling all the development chains "
+
+    # delete folders
+    rm -rf ./node1
+    rm -rf ./node2
+    rm -rf ./node3
+
+    # delete password file
+    [ -e ./password ] && rm password
+
+    # delete reserved-peers file
+    [ -e ./reserved-peers ] && rm reserved-peers
+
+    # create dev.json
+    [ -e ./dev.json ] && rm dev.json
+
+    if [ $? -eq 0 ]; then  echo -e ${success}; else echo -e ${failed}; fi
+}
+
+installnode() {
+    #arguments
+    node_no=$2
+
+    #variables
+    node_name="node$node_no"
+    dirname="$node_name"
+
+    printf "   * $1ing development chain $dirname "
+
+    # delete folders if they exist
+    rm -rf $dirname
+
+    # create empty password file
+    echo '' > password
+    echo '' > reserved-peers
+
+    # create dev.json
+    echo '{' >  dev.json
+    echo '  "name": "DevelopmentChain",' >>  dev.json
+    echo '  "engine": {' >>  dev.json
+    echo '    "instantSeal": null' >>  dev.json
+    echo '  },' >>  dev.json
+    echo '  "params": {' >>  dev.json
+    echo '    "gasLimitBoundDivisor": "0x0400",' >>  dev.json
+    echo '    "accountStartNonce": "0x0",' >>  dev.json
+    echo '    "maximumExtraDataSize": "0x20",' >>  dev.json
+    echo '    "minGasLimit": "0x1388",' >>  dev.json
+    echo '    "networkID" : "0x11"' >>  dev.json
+    echo '  },' >>  dev.json
+    echo '  "genesis": {' >>  dev.json
+    echo '    "seal": {' >>  dev.json
+    echo '      "generic": "0x0"' >>  dev.json
+    echo '    },' >>  dev.json
+    echo '    "difficulty": "0x20000",' >>  dev.json
+    echo '    "author": "0x0000000000000000000000000000000000000000",' >>  dev.json
+    echo '    "timestamp": "0x00",' >>  dev.json
+    echo '    "parentHash": "0x0000000000000000000000000000000000000000000000000000000000000000",' >>  dev.json
+    echo '    "extraData": "0x",' >>  dev.json
+    echo '    "gasLimit": "0x5B8D80"' >>  dev.json
+    echo '  },' >>  dev.json
+    echo '  "accounts": {' >>  dev.json
+    echo '    "0000000000000000000000000000000000000001": { "balance": "1", "builtin": { "name": "ecrecover", "pricing": { "linear": { "base": 3000, "word": 0 } } } },' >>  dev.json
+    echo '    "0000000000000000000000000000000000000002": { "balance": "1", "builtin": { "name": "sha256", "pricing": { "linear": { "base": 60, "word": 12 } } } },' >>  dev.json
+    echo '    "0000000000000000000000000000000000000003": { "balance": "1", "builtin": { "name": "ripemd160", "pricing": { "linear": { "base": 600, "word": 120 } } } },' >>  dev.json
+    echo '    "0000000000000000000000000000000000000004": { "balance": "1", "builtin": { "name": "identity", "pricing": { "linear": { "base": 15, "word": 3 } } } },' >>  dev.json
+    echo '    "049b866b198ecc3791aa3b3d885c16fba60b9a0c": { "balance": "100000000000000000000" },' >>  dev.json
+    echo '    "18f3a4359296d400b825bf589285cfb904aa0289": { "balance": "100000000000000000000" },' >>  dev.json
+    echo '    "262bc77dfc5748620641325b3617fc07b20f0b92": { "balance": "100000000000000000000" },' >>  dev.json
+    echo '    "2d8785375886cf900126cf3082aad6f47427a1d7": { "balance": "100000000000000000000" },' >>  dev.json
+    echo '    "39ae18fde4750477f910e8ed6eb2c261beaf16f2": { "balance": "100000000000000000000" },' >>  dev.json
+    echo '    "432987ffebb29e4c1a365ee4a4db1188089f94cc": { "balance": "100000000000000000000" },' >>  dev.json
+    echo '    "57c7002d6766300e58b5f625fb216a09bbbababf": { "balance": "100000000000000000000" },' >>  dev.json
+    echo '    "85e32757c15909f2213e23ffe8c2d4403b497f7e": { "balance": "100000000000000000000" },' >>  dev.json
+    echo '    "a93b4e337f65b0468d22f0cd38c1e9ae95e429e2": { "balance": "100000000000000000000" },' >>  dev.json
+    echo '    "ccdf379189ac64274ac9353226b85b562d4cacfe": { "balance": "1606938044258990275541962092341162602522202993782792835301376" }' >>  dev.json
+    echo '  }' >>  dev.json
+    echo '}' >>  dev.json
+
+    # create keys folder
+    mkdir -p $dirname/keys/DevelopmentChain
+    mkdir -p $dirname/signer
+
+    #creating the key files
+    createkeys $dirname
+}
+
+# create the key files
+createkeys() {
+    dirname=$1
+    echo '{"id":"846e4fb5-e7da-0fc6-56d3-b0807bf35b90","version":3,"crypto":{"cipher":"aes-128-ctr","cipherparams":{"iv":"0676ec5eb0ee93e9621301be3489f63e"},"ciphertext":"903d60c615649319fa34fce0bfa48791bf4f9fe1e619a14f5f6817121d70f81b","kdf":"pbkdf2","kdfparams":{"c":10240,"dklen":32,"prf":"hmac-sha256","salt":"4717382f4f31378125afae6864dc0360f3f9dccf1a7a0a03a003b9586afce556"},"mac":"d84d2c6894f975d48d7a84f8209ff2f621526ee7f55501a429f4751b13ec5eaa"},"address":"049b866b198ecc3791aa3b3d885c16fba60b9a0c","name":"A1","meta":"{\"description\":\"Test Account\",\"passwordHint\":\"Password is empty string\"}"}' >  ${dirname}/keys/DevelopmentChain/UTC--2018-05-01T13-57-45Z--846e4fb5-e7da-0fc6-56d3-b0807bf35b90
+    echo '{"id":"9f64f61a-a0ed-0805-4caf-e97332af66d4","version":3,"crypto":{"cipher":"aes-128-ctr","cipherparams":{"iv":"9cd0c54f8713d781c86398dff089d76f"},"ciphertext":"9361ad5717e8c58948ca51d5af0750c241bafd0b27a87c63939646e44123f636","kdf":"pbkdf2","kdfparams":{"c":10240,"dklen":32,"prf":"hmac-sha256","salt":"4b2852175ea9e2f3efcbc0deaffbf64961f5063c217fcb915f2958b2c7dd207d"},"mac":"7b13a871fea2b638c78abf7e4b08a8cd787839f633d5e133e5fda9ab8d65f93a"},"address":"18f3a4359296d400b825bf589285cfb904aa0289","name":"A2","meta":"{\"description\":\"Test Account\",\"passwordHint\":\"Password is empty string\"}"}' >  ${dirname}/keys/DevelopmentChain/UTC--2018-05-01T13-57-42Z--9f64f61a-a0ed-0805-4caf-e97332af66d4
+    echo '{"id":"f4da4771-aaaf-55fe-a8e7-506e951c453a","version":3,"crypto":{"cipher":"aes-128-ctr","cipherparams":{"iv":"c991bd61dfc198f243582fb4f5896bb2"},"ciphertext":"f6d19c892f9c84564dee0497314350248c8e15245c28276be1a1a24905342c0f","kdf":"pbkdf2","kdfparams":{"c":10240,"dklen":32,"prf":"hmac-sha256","salt":"6b830ad9b47a4d94175569fecb3fffc071511753bf09cb6dbb1a85b819504387"},"mac":"976724a229cf6f522e078bcba0d639ca19c480dcd0c03f614a0a8ef1df4fd140"},"address":"262bc77dfc5748620641325b3617fc07b20f0b92","name":"A3","meta":"{\"description\":\"Test Account\",\"passwordHint\":\"Password is empty string\"}"}' >  ${dirname}/keys/DevelopmentChain/UTC--2018-05-01T13-57-12Z--f4da4771-aaaf-55fe-a8e7-506e951c453a
+    echo '{"id":"3a9d7868-9bc7-6a9d-42e8-43402a36ed52","version":3,"crypto":{"cipher":"aes-128-ctr","cipherparams":{"iv":"9c4eb132d7b83ea6ee3f1109b0a4c035"},"ciphertext":"da96020e14a26e9aeb4aaa54caafb18b7c6f11362b5fcc7c4b7373075a238d5a","kdf":"pbkdf2","kdfparams":{"c":10240,"dklen":32,"prf":"hmac-sha256","salt":"ff8e3b75437e432e17fdd01a4ddef83100127bd2d38d3d64aa48febb218017b2"},"mac":"8379ef2c6bef22c76eb10fdb60a1ba9df40efb0b86ad2751a454c50c0ad0cefd"},"address":"2d8785375886cf900126cf3082aad6f47427a1d7","name":"A4","meta":"{\"description\":\"Test Account\",\"passwordHint\":\"Password is empty string\"}"}' >  ${dirname}/keys/DevelopmentChain/UTC--2018-05-01T13-57-46Z--3a9d7868-9bc7-6a9d-42e8-43402a36ed52
+    echo '{"id":"76a0ae69-604f-e28a-68f2-46a0c950a3f0","version":3,"crypto":{"cipher":"aes-128-ctr","cipherparams":{"iv":"80a9c15eb34271d209413384ce9b31e2"},"ciphertext":"0b0235ad1ab1916365b10143f8350b73d35a45d637114ac92cd09bb22fd59e27","kdf":"pbkdf2","kdfparams":{"c":10240,"dklen":32,"prf":"hmac-sha256","salt":"9042a6374827e7b72cff3ad542e9e7c5c792c188e1d767c39d1d2bd11dc55bc0"},"mac":"02d69f4a2815d01c60400e454c1f691a1b6ac20ba15959fb247561da7c650119"},"address":"39ae18fde4750477f910e8ed6eb2c261beaf16f2","name":"A5","meta":"{\"description\":\"Test Account\",\"passwordHint\":\"Password is empty string\"}"}' >  ${dirname}/keys/DevelopmentChain/UTC--2018-05-01T13-57-47Z--76a0ae69-604f-e28a-68f2-46a0c950a3f0
+    echo '{"id":"074a79a7-cf6d-4a45-c21e-dee2e8080b94","version":3,"crypto":{"cipher":"aes-128-ctr","cipherparams":{"iv":"36fec47825ccd7de3748fddd8f91de38"},"ciphertext":"1bdcbcfa8df79f259de40f1ab75374153d4c7dbd0c75af48a781b90edb8810ef","kdf":"pbkdf2","kdfparams":{"c":10240,"dklen":32,"prf":"hmac-sha256","salt":"e9dc1e307241d7bef372f6870d253dcdee5b6fb73ff09663421f7d23524cd7c2"},"mac":"c574508fa5df4bb6881b727d6c7062944e0b99d279d83a8dd9cdac429d936ff4"},"address":"432987ffebb29e4c1a365ee4a4db1188089f94cc","name":"A6","meta":"{\"description\":\"Test Account\",\"passwordHint\":\"Password is empty string\"}"}' >  ${dirname}/keys/DevelopmentChain/UTC--2018-05-01T13-57-43Z--2a3a4dd6-3080-272f-9a27-5828a64d5ae8
+    echo '{"id":"ccd4dddd-9320-dd82-a020-666a62c80f97","version":3,"crypto":{"cipher":"aes-128-ctr","cipherparams":{"iv":"202584603044f8544f7d2d6a9f164468"},"ciphertext":"213758c593bc810645b45cea3d740d1cd5cf714e2d3b817621a18289fc101d42","kdf":"pbkdf2","kdfparams":{"c":10240,"dklen":32,"prf":"hmac-sha256","salt":"19b41762ce030bc18dc670902c84f2b2dfcf0a77b439db38ab3735a9b3181c15"},"mac":"af09a00c88882a83e5684c5436d189ccdfa013252d5056b67c58ff0dc33ebff7"},"address":"57c7002d6766300e58b5f625fb216a09bbbababf","name":"A7","meta":"{\"description\":\"Test Account\",\"passwordHint\":\"Password is empty string\"}"}' >  ${dirname}/keys/DevelopmentChain/UTC--2018-05-01T13-57-49Z--ccd4dddd-9320-dd82-a020-666a62c80f97
+    echo '{"id":"b4592a04-89b0-0643-3cb2-269ba80ee3d5","version":3,"crypto":{"cipher":"aes-128-ctr","cipherparams":{"iv":"c20cf23599e7622f050d3875c5fc8652"},"ciphertext":"c41aa4d32ef5635e60c1bf3d645d0da4768f4bc98a52918c71ab47d10b83a6ea","kdf":"pbkdf2","kdfparams":{"c":10240,"dklen":32,"prf":"hmac-sha256","salt":"4c9b1c76a6d913dc061c8bee4952789aa812d8e877a2f3959d0034a485bfa82d"},"mac":"198a3e48e02f9c9494c014efc0e838dde801b44763bbd491d2a39214d337872f"},"address":"85e32757c15909f2213e23ffe8c2d4403b497f7e","name":"A8","meta":"{\"description\":\"Test Account\",\"passwordHint\":\"Password is empty string\"}"}' >  ${dirname}/keys/DevelopmentChain/UTC--2018-05-01T13-57-38Z--b4592a04-89b0-0643-3cb2-269ba80ee3d5
+    echo '{"id":"157ebd30-b917-aeb0-aa54-2c8131641d8f","version":3,"crypto":{"cipher":"aes-128-ctr","cipherparams":{"iv":"bc615d0631299800d5a1b97e9954c7f4"},"ciphertext":"166be454eff080abf31f2a69ebd1617b6652efe58cdbb6f725018c051d816a45","kdf":"pbkdf2","kdfparams":{"c":10240,"dklen":32,"prf":"hmac-sha256","salt":"31c06b50f29490157224b2b7e2e62e0a9203106207d3b5327aa33481614f910a"},"mac":"94099f00665169a12613c66213fbcc1d67d98254036d43db1f74a10f2806a71b"},"address":"a93b4e337f65b0468d22f0cd38c1e9ae95e429e2","name":"A9","meta":"{\"description\":\"Test Account\",\"passwordHint\":\"Password is empty string\"}"}' >  ${dirname}/keys/DevelopmentChain/UTC--2018-05-01T13-57-48Z--157ebd30-b917-aeb0-aa54-2c8131641d8f
+    echo '{"id":"2a3a4dd6-3080-272f-9a27-5828a64d5ae8","version":3,"crypto":{"cipher":"aes-128-ctr","cipherparams":{"iv":"410f242ce0721f1a430b1b88b91b8dd6"},"ciphertext":"012ab92f4ae4023e711c2ffeab51c7154f9bcb939776110611cc6b089a726a1d","kdf":"pbkdf2","kdfparams":{"c":10240,"dklen":32,"prf":"hmac-sha256","salt":"172512a0872848522127d2d161c8f793fac9435a856994e332fa2284cfaaf30a"},"mac":"3b5cdee27379bc62e5f0691c6f15148f82295cd2eaf8105d63717f385ab3faab"},"address":"ccdf379189ac64274ac9353226b85b562d4cacfe","name":"Development Account","meta":"{\"description\":\"Never use this account outside of development chain!\",\"passwordHint\":\"Password is empty string\"}"}' > ${dirname}/keys/DevelopmentChain/UTC--2018-05-01T13-43-09Z--074a79a7-cf6d-4a45-c21e-dee2e8080b94
+    if [ $? -eq 0 ]; then  echo -e ${success}; else echo -e ${failed}; fi
+}
+
+stop() {
+    #arguments
+    node_no=$1
+    
+    #variables
+    node_name="node$node_no"    
+    dirname="$node_name"
+
+    #filename
+    pid_filename="./$node_name/parity$node_no.pid"
+    
+    if [[ -f $pid_filename ]]; then
+        printf "   * Stopping existing development chain $dirname "
+        if ps -p `cat $pid_filename` > /dev/null; then
+            kill -9 `cat $pid_filename` 2> /dev/null
+            echo -e ${success};
+        else
+            echo -e ${failed};
+            echo -e "Parity is still running, Kill it before starting";
+        fi
+        rm -rf $pid_filename
+    fi
+}
+
+start() {
+  # arguments
+  node_no=$1
+
+  #variables
+  port_shift_count=$((2*($node_no-1)))
+  node_name="node$node_no"
+  identity=dev${node_no}   
+  dirname="$node_name"
+
+  #file names
+  pid_filename="$dirname/parity$node_no.pid"
+  nohup_out_filename="$dirname/$node_name.out"
+
+  stop $node_no
+  printf "   \n * Starting development chain $dirname "                
+
+  if [[ "$node_no" -eq 1 ]]; then
+  	# nohup parity config for node1
+    nohup parity --base-path=${dirname} --config=dev --chain=dev.json --identity=$identity --geth \
+        --reseal-min-period=0 --gasprice=0 --nodiscover \
+        --jsonrpc-apis=all --jsonrpc-cors=all --ws-origins=all \
+        --force-ui --ui-no-validation --unsafe-expose \
+        --author=049b866b198ecc3791aa3b3d885c16fba60b9a0c \
+        --unlock=049b866b198ecc3791aa3b3d885c16fba60b9a0c,18f3a4359296d400b825bf589285cfb904aa0289,262bc77dfc5748620641325b3617fc07b20f0b92,2d8785375886cf900126cf3082aad6f47427a1d7,39ae18fde4750477f910e8ed6eb2c261beaf16f2 \
+        --password=password \
+        > $nohup_out_filename 2>&1 & 
+    echo $! > $pid_filename 
+  else 
+    # nohup parity config for all nodes except node1
+    nohup parity -d ${dirname} --config=dev --chain=dev.json --identity=$identity --geth \
+        --ports-shift=$port_shift_count --nodiscover \
+        --reserved-peers=./reserved-peers \
+	    --no-ui --jsonrpc-off --no-ws \
+        > $nohup_out_filename 2>&1 &
+        echo $! > $pid_filename
+  fi
+
+  sleep 1
+  # get PID of the running node 
+  if ps -p `cat $pid_filename` > /dev/null; then 
+    echo -e ${success};
+    printURLs $node_no
+  else
+    echo -e ${failed};
+    echo -e "Parity is still running, Kill it before starting";
+  fi
+                                              
+  # wait for parity to write enode info into $nohup_out_filename
+  sleep 10 
+  enode_separator="enode://"
+  while read line
+      do
+        if [[ $line = *$enode_separator* ]]; then 
+            enode_value=$enode_separator${line##*$enode_separator} 
+            break
+        fi
+      done < $nohup_out_filename
+
+  #write obtained enode value into reserved_peers file
+  echo -e $enode_value >> ./reserved-peers
+}
+
+printURLs() {
+  # Multiple users to acces the url
+  node_no=$1
+  port_shift_count=$((2*($node_no-1)))
+  IP=$(ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1')
+
+    if [[ "$node_no" -eq 1 ]]; then
+        token=$(curl -s --data '{"method":"signer_generateAuthorizationToken","params":[],"id":1,"jsonrpc":"2.0"}' -H "Content-Type: application/json" -X POST http://$IP:8545)
+        signer_token=${token:27:19}
+        echo -n "     - Parity UI: http://$IP:$((8180+$port_shift_count))/#/?token=$signer_token
+     - Remix IDE: http://$IP:$((8545+$port_shift_count)) use in http://remix.ethereum.org as web3 provider
+        "
+    else 
+        echo -n " "
+    fi 
+}
+
+install () {
+    methodname=$1
+    node_count=$2
+    for ((i=0; i< $node_count; i++)) {
+        installnode $1 $(($i+1))
+    }
+}
+
+if [ $# -eq 0 ]; then
+  install Install 3
+  start 1
+  start 2
+  start 3
+else
+    # parse all the options first
+    for key in "$@"
+    do
+        case $key in
+            -h | --help)
+            usage 
+            exit 0             
+            ;;
+            -v | --version)
+            exit 0
+            ;;
+        esac
+     done
+
+    # go through the commands
+    for key in "$@"
+    do
+        case $key in
+            install)
+            install Install 3
+            ;;
+            reset)
+            install Reset 3
+            ;;
+            uninstall)
+            uninstall
+            ;;
+            start)
+            start 1
+            start 2
+            start 3
+            ;;
+            stop)
+            stop 1 
+            stop 2
+            stop 3
+            ;;
+            *)
+            usage
+            echo " * Unknown parameter or option. "
+            exit 1
+            ;;
+        esac
+    done
+fi
+echo ''
+
+#tail -f /dev/null
