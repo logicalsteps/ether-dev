@@ -2,18 +2,19 @@
 
 Ether-Dev is a command line tool for Mac and Linux to host a 3 node ethereum blockchain with Parity
 
-It will take your current working directory as the base and does the following,
+It will take your current working directory as the base and does the following
+When you run it without any command line parameters,
 
 1. If there are any existing blockchain data it will be deleted.
-2. Initializes a new chain having using `dev.json`  with 10 accounts with 100 ether each
+2. Initializes a new chain using `dev.json` with 10 accounts with 100 ether each
 3. Three nodes will be created with the folders node1, node2 and node3.
 4. Start the chain and
     1. Unlocks first 5 the accounts for easy testing
-    2. Remaining 5 accounts can be unloacked with blank password
+    2. Remaining 5 accounts can be unlocked with blank password
     2. Exposes RPC interface at http://127.0.0.0:8545
     3. Exposes WebSocket interface at ws://127.0.0.0:8546
     4. Exposes Parity UI interface at http://127.0.0.0:8180
-5. Url for the parity ui on your network is providerd along with signer token
+5. Url for the parity ui on your network is provided along with signer token
 
 ## Prerequisite
 
@@ -89,7 +90,7 @@ After starting the process, output is shown as below
     ![](images/parityui-1.png)
     2. Click the check box shown, next at the bottom right corner a pop message appears. Select **APPROVE**
     3. Now select **Parity Wallet** icon
-    4. The Parity UI will appear like the image below having 10 accounts with 100 eth each.
+    4. The Parity UI will appear like the image below having 10 accounts with 100 ether each.
     ![](images/ParityUI.png)
     5. With reference to the above image, Accounts from A1 to A5 are unlocked, but remaining accounts from A5 are locked. The password which is used for unlocking the accounts is Blank password.
     6. Transactions can be made with Accounts from A1 to A5 as they are unlocked, But we need to **Approve** each transaction which are made from A5 to remaining accounts.
