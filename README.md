@@ -3,7 +3,7 @@
 Ether-Dev is a command line tool for Mac and Linux to host a 3 node ethereum blockchain with Parity
 
 It will take your current working directory as the base and does the following
-When you run it without any command line parameters,
+when you run it without any command line parameters,
 
 1. If there are any existing blockchain data it will be deleted.
 2. Initializes a new chain using `dev.json` with 10 accounts with 100 ether each
