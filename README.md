@@ -1,6 +1,37 @@
-# Using the Private Ethereum Blockchain (Ether-Dev)
+# Using Ether-Dev to create your Private Ethereum Blockchain
 
-To run Ether-Dev, first you need to install [Parity](https://github.com/paritytech/parity#config-file)
+Ether-Dev is a command line tool for Mac and Linux to host a 3 node ethereum blockchain with Parity
+
+It will take your current working directory as the base and does the following,
+
+1. If there are any existing blockchain data it will be deleted.
+2. Initializes a new chain having using `dev.json`  with 10 accounts with 100 ether each
+3. Three nodes will be created with the folders node1, node2 and node3.
+4. Start the chain and
+    1. Unlocks first 5 the accounts for easy testing
+    2. Remaining 5 accounts can be unloacked with blank password
+    2. Exposes RPC interface at http://127.0.0.0:8545
+    3. Exposes WebSocket interface at ws://127.0.0.0:8546
+    4. Exposes Parity UI interface at http://127.0.0.0:8180
+5. Url for the parity ui on your network is providerd along with signer token
+
+## Prerequisite
+
+To run Ether-Dev, make sure you have installed [Parity] (https://github.com/paritytech/parity#config-file). If not
+
+1. Install parity using the one-line installer. For more details please refer below
+2. Download `ether-dev` script from the repository or clone into the repository
+3. Give Execute permission to the script using the command below
+
+          chmod +x ether-dev
+
+4. Now you can perform the tasks as given below
+
+        ether-dev install
+        ether-dev start
+        ether-dev stop
+        ether-dev reset
+        ether-dev uninstall
 
 #### Simple one-line installer of parity for Mac and Ubuntu
 
@@ -15,25 +46,9 @@ bash <(curl https://get.parity.io -Lk) -r stable
 ```
 
 
-For more details about parity please refer to the official [website](https://www.parity.io/)
+For more details about parity please refer to the official [website] (https://www.parity.io/)
 
-For details about installation please refer the link for [Parity](https://github.com/paritytech/parity#config-file)
-
-## About Ether-Dev
-
-We created a personal node for testing, by using the steps below. Since all the work is already done, you may simply take the ether-dev file from this repository and run `ether-dev` Shell script.
-
-It will,
-
-1. If there are any existing blockchain data it will Delete them.
-2. Initialize a new chain having node1 with `dev.json` which gives 100 ether for each account
-3. It will automatically create private test network with 3 ether nodes and its corresponding interface.
-4. Start the chain where it shows for node1
-    1. Unlock all the accounts for easy testing
-    2. Expose RPC interface at http://127.0.0.0:8545
-    3. Expose WebSocket interface at ws://127.0.0.0:8546
-    4. Expose Parity UI interface at http://127.0.0.0:8180
-5. Url for 1st node is accessed along with signer token
+For details about installation please refer the link for [Parity] (https://github.com/paritytech/parity#config-file)
 
 ## Usage
 
@@ -53,7 +68,7 @@ It will,
        -h | --help     Shows a list of commands and options
 
 
-### Install the Ethereum Blockchain (Parity)
+### Install the Ethereum Blockchain
 
     ether-dev install
 
@@ -61,7 +76,7 @@ Terminal looks like below image
 
 ![](images/etherdev-install.png)
 
-### Start the Ethereum Blockchain (Parity)
+### Start the Ethereum Blockchain
 
     ether-dev start
 
@@ -74,17 +89,21 @@ After starting the process, output is shown as below
     ![](images/parityui-1.png)
     2. Click the check box shown, next at the bottom right corner a pop message appears. Select **APPROVE**
     3. Now select **Parity Wallet** icon
-    4. The Parity UI will appear like the image below having 10 accounts with 100 ether each.
+    4. The Parity UI will appear like the image below having 10 accounts with 100 eth each.
     ![](images/ParityUI.png)
+    5. With reference to the above image, Accounts from A1 to A5 are unlocked, but remaining accounts from A5 are locked. The password which is used for unlocking the accounts is Blank password.
+    6. Transactions can be made with Accounts from A1 to A5 as they are unlocked, But we need to **Approve** each transaction which are made from A5 to remaining accounts.
 
 2. Open http://remix.ethereum.org under **RUN** go to **Environment** field and select **Web3 Provider** from the drop down list.
 3. It prompts for dialog box saying **Are you sure you want to connect to an ethereum node?** select **OK**
 4. Now provide the Web3 Provider Endpoint url which is displayed in your terminal for Remix IDE (eg: http://172.31.21.36:8545) and select **OK**
-5. Remix is now connected to you dev nodes, where it displays all the 10 accounts created under Accounts field in drop down showing all the accounts having 100 ether each.
+5. Remix is now connected to you dev nodes, where it displays all the 10 accounts created under Accounts field in drop down showing all the accounts having 100 eth each.
+6. Solidity contracts can be created using Parity UI or in Remix IDE
 
 ![](images/RemixIDE.png)
 
-### Stop the Ethereum Blockchain (Parity)
+
+### Stop the Ethereum Blockchain
 
 
     ether-dev stop
@@ -93,7 +112,17 @@ Output looks like the image below
 
 ![](images/ether-dev_stop.png)
 
-### Uninstall the Ethereum Blockchain (Parity)
+### Reset the Ethereum Blockchain
+
+    ether-dev reset
+
+This resets all the nodes so that you can start the ethereum blockchain again.
+
+Output would be shown as below image
+
+![](images/etherdev-reset.png)
+
+### Uninstall the Ethereum Blockchain
 
     ether-dev uninstall
 
